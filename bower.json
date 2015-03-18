@@ -1,0 +1,24 @@
+{
+  "name": "purescript",
+  "version": "0.0.0",
+  "authors": [
+    "Moritz Drexl <mdrexl@fastmail.fm>"
+  ],
+  "main": "dist/Main.js",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "purescript-math": "0.1.0",
+    "purescript-void": "~0.1.0",
+    "purescript-halogen": "git://github.com/slamdata/purescript-halogen#master",
+    "closure-compiler": "http://dl.google.com/closure-compiler/compiler-latest.zip",
+    "purescript-either": "~0.1.5"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
