@@ -2102,6 +2102,7 @@ PS.Main = (function () {
     var Halogen_Themes_Bootstrap3_InputGroup = PS.Halogen_Themes_Bootstrap3_InputGroup;
     var Data_Foreign_Class = PS.Data_Foreign_Class;
     function appendToBody(node) {  return function() {    document.body.appendChild(node);  };};
+    function autocomplete(term) {  return function(k) {    return function() {      var xhr = new XMLHttpRequest();      xhr.onreadystatechange = function(){        if (xhr.readyState === 4) {          k(JSON.parse(xhr.responseText))();        }      };      xhr.open('POST', '/autocomplete?term=' + term, true);      xhr.send();    };  };};
     var Result = (function () {
         function Result() {
 
@@ -2157,6 +2158,15 @@ PS.Main = (function () {
         };
         return SetQuery;
     })();
+    var SetCompletions = (function () {
+        function SetCompletions(value0) {
+            this.value0 = value0;
+        };
+        SetCompletions.create = function (value0) {
+            return new SetCompletions(value0);
+        };
+        return SetCompletions;
+    })();
     var OpenMore = (function () {
         function OpenMore(value0) {
             this.value0 = value0;
@@ -2186,7 +2196,9 @@ PS.Main = (function () {
     var handleRequest = function (_644) {
         return function (_645) {
             if (_644 instanceof Completions) {
-                return _645(new SetQuery(_644.value0));
+                return autocomplete(Prelude.show(showQuery)(_644.value0))(function (completions) {
+                    return _645(new SetCompletions(completions));
+                });
             };
             if (_644 instanceof Search) {
                 return _645(new SetQuery(_644.value0));
@@ -2204,6 +2216,7 @@ PS.Main = (function () {
         Completions: Completions, 
         Search: Search, 
         SetQuery: SetQuery, 
+        SetCompletions: SetCompletions, 
         OpenMore: OpenMore, 
         Query: Query, 
         main: main, 
@@ -2211,6 +2224,7 @@ PS.Main = (function () {
         ui: ui, 
         view: view, 
         update: update, 
+        autocomplete: autocomplete, 
         appendToBody: appendToBody, 
         showQuery: showQuery
     };

@@ -31,6 +31,22 @@ foreign import appendToBody
   \  };\
   \}" :: forall eff. Node -> Eff (dom :: DOM | eff) Node
 
+foreign import autocomplete
+  "function autocomplete(term) {\
+  \  return function(k) {\
+  \    return function() {\
+  \      var xhr = new XMLHttpRequest();\
+  \      xhr.onreadystatechange = function(){\
+  \        if (xhr.readyState === 4) {\
+  \          k(JSON.parse(xhr.responseText))();\
+  \        }\
+  \      };\
+  \      xhr.open('POST', '/autocomplete?term=' + term, true);\
+  \      xhr.send();\
+  \    };\
+  \  };\
+  \}" :: forall eff. String -> ([String] -> Eff (http :: HTTP | eff) Unit) -> Eff (http :: HTTP | eff) Unit
+
 newtype Query = Query String
 
 instance showQuery :: Show Query where
@@ -39,6 +55,7 @@ instance showQuery :: Show Query where
 type Entry = Number
 
 data Input = SetQuery Query
+           | SetCompletions [String]
            | OpenMore Entry
 
 data Request = Completions Query
@@ -114,7 +131,8 @@ ui = view <$> stateful (State (Query "") [] 0 0) update
 
 handleRequest :: forall eff. Handler Request Input (http :: HTTP | eff)
 handleRequest (Completions query) k = do
-  k (SetQuery query)
+  autocomplete (show query) \completions ->
+    k (SetCompletions completions)
 
 handleRequest (Search query) k = do
   k (SetQuery query)
